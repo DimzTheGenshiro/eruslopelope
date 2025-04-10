@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Memory Kami</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to right, #ffd1dc, #d0f0fd);
+      font-family: 'Comic Sans MS', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      text-align: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .photo-box {
+      width: 250px;
+      height: 250px;
+      border-radius: 25px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      margin-bottom: 10px;
+    }
+
+    .photo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: all 0.7s ease;
+    }
+
+    .photo-box img.fade {
+      opacity: 0;
+      transform: scale(1.1);
+    }
+
+    .caption {
+      font-weight: bold;
+      color: #444;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .cute-button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .cute-button img {
+      width: 60px;
+      height: 60px;
+      transition: transform 0.3s;
+    }
+
+    .cute-button.clicked img {
+      transform: scale(1.3) rotate(10deg);
+    }
+
+    .falling-heart {
+      position: absolute;
+      top: -50px;
+      color: pink;
+      font-size: 20px;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    .doll {
+      position: absolute;
+      bottom: 20px;
+      width: 300px;
+    }
+
+    .doll.left {
+      left: 50px;
+    }
+
+    .doll.right {
+      right: 50px;
+    }
+    
+    .hug-button {
+  background-color: #ffb6c1;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.hug-button:hover {
+  background-color: #ffa4b2;
+}
+
+.hug-scene {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 99;
+  background: rgba(255, 240, 245, 0.9);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  animation: popUp 0.6s ease;
+}
+
+.hug-bear {
+  width: 120px;
+  animation: hugMove 1s infinite alternate;
+}
+
+.hug-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #c94b6e;
+  margin-top: 10px;
+  animation: fadeIn 1s ease;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes hugMove {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes popUp {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="photo-box">
+    <img src="https://files.catbox.moe/sho852.jpg" id="photo">
+  </div>
+  <p class="caption" id="caption">Memory</p>
+  <button class="cute-button" onclick="changePhoto()" id="cuteBtn">
+    <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" alt="cute icon">
+  </button>
+
+  <!-- Tombol Peluk -->
+  <button class="hug-button" onclick="showHug()">
+    Peluk!
+  </button>
+
+  <!-- Scene Pelukan -->
+  <div id="hugScene" class="hug-scene hidden">
+    <img src="https://pngimg.com/uploads/teddy_bear/teddy_bear_PNG94.png" class="hug-bear">
+    <p class="hug-text">Peluk dikirim buat kamu!</p>
+  </div>
+</div>
+
+<img src="https://pngimg.com/uploads/teddy_bear/teddy_bear_PNG88.png" class="doll left">
+<img src="https://pngimg.com/uploads/teddy_bear/teddy_bear_PNG91.png" class="doll right">
+
+<audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
+<audio id="bgmusic" autoplay loop>
+  <source src="https://files.catbox.moe/zxb6ch.mp3" type="audio/mp3">
+</audio>
+
+<script>
+  let isFirstPhoto = true;
+  const captions = [
+  "Aku Sayang Kamu",
+  "Lucu Banget!",
+  "Ciee Bucin Nih",
+  "Gemoyy Parah",
+  "UwU Kamu",
+  "Kenangan Manis",
+  "Selalu Bareng",
+  "Senyummu Candu",
+  "Cinta Terbaik",
+  "Kamu Segalanya"
+];
+function changeCaptionAuto() {
+  const caption = document.getElementById("caption");
+  let current = 0;
+
+  setInterval(() => {
+    caption.textContent = captions[current];
+    current = (current + 1) % captions.length;
+  }, 3000); // ganti tiap 3 detik
+}
+window.onload = () => {
+  changeCaptionAuto();
+};
+
+  function createHeart() {
+    const heart = document.createElement("div");
+    heart.classList.add("falling-heart");
+    heart.style.left = Math.random() * 200 + "vw";
+    heart.style.animationDuration = Math.random() * 3 + 2 + "s";
+    heart.innerText = "💖";
+    document.body.appendChild(heart);
+
+    setTimeout(() => {
+      heart.remove();
+    }, 5000);
+  }
+
+  setInterval(createHeart, 300);
+  
+
+  function changePhoto() {
+    const photo = document.getElementById('photo');
+    const caption = document.getElementById('caption');
+    const clickSound = document.getElementById('clickSound');
+    const cuteBtn = document.getElementById('cuteBtn');
+
+    clickSound.play();
+    cuteBtn.classList.add('clicked');
+
+    setTimeout(() => {
+      cuteBtn.classList.remove('clicked');
+    }, 300);
+
+    photo.classList.add('fade');
+
+    setTimeout(() => {
+      if (isFirstPhoto) {
+        photo.src = "https://files.catbox.moe/sho852.jpg";
+        caption.textContent = "Ini Dia";
+      } else {
+        photo.src = "https://files.catbox.moe/g2nf6x.jpg";
+        caption.textContent = "Ini Aku";
+      }
+
+      isFirstPhoto = !isFirstPhoto;
+      photo.classList.remove('fade');
+    }, 700);
+  }
+  function showHug() {
+  const hugScene = document.getElementById('hugScene');
+  hugScene.classList.remove('hidden');
+
+  setTimeout(() => {
+    hugScene.classList.add('hidden');
+  }, 10000); // otomatis hilang setelah 3 detik
+}
+
+  // Untuk autoplay audio di mobile
+  window.addEventListener('click', () => {
+    const bgm = document.getElementById('bgmusic');
+    bgm.play().catch(() => {});
+  }, { once: true });
+</script>
+
+</body>
+</html>
